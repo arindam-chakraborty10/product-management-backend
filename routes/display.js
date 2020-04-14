@@ -102,6 +102,8 @@ router.post('/pagination', auth, async (req, res) => {
       return res.status(400).send({ Error: 'Invalid page request...' });
 
     const count = await Order.find().countDocuments();
+    if (count == 0) return res.status(404).send({ Error: 'No data found....' });
+
     if (count % limit == 0) var max_page = count / limit;
     else var max_page = Math.ceil(count / limit);
 
@@ -193,7 +195,11 @@ router.post('/extensions', auth, async (req, res) => {
     const search = new RegExp(req.query.search, 'i');
     console.log(search);
     const products = await Product.find({ name: search });
-    res.send(products);
+    if (products.length == 0) {
+      res.status(400).send({ Error: 'No product found...' });
+    } else {
+      res.send(products);
+    }
   } catch (error) {
     res.status(400).send(error);
   }
